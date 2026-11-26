@@ -1,5 +1,4 @@
 Natuurachtergrond = achtergrond.png
-Mac OS Logo = macoslogo.jpg
 Jaipur (India) van boven = jaipurvanboven.jpg
 Ganges (India) van boven = gangesvanboven.jpg
 Hotel Urban Chant = hotelurbanchant.jpg
@@ -36,6 +35,8 @@ Canva Business = Canva Business.png
 Canva Pro = Canva Pro.png
 PostNL Logo = PostNL-Logo.png
 Microsoft Logo = Microsoft-Logo.png
+Mac OS Logo = macoslogo.jpg
+Kruitvat Logo = https://media.kruidvat.nl/medias/sys_master/root/hbc/h10/64895657836574/logo-Kruidvat-2026/logo-Kruidvat-2026.svg
 Locomotief-Intercity-Berlijn.png
 Intercity-Berlijn-Wagon.png
 Bolletje = bolletje.webp
