@@ -39,3 +39,4 @@ Microsoft Logo = Microsoft-Logo.png
 Locomotief-Intercity-Berlijn.png
 Intercity-Berlijn-Wagon.png
 Bolletje = bolletje.webp
+Black Friday = https://cdn.sanity.io/images/2cbxljzy/production/ab490b7bc9ac974999c798c705bda3a2ef9087f5-1280x720.svg?rect=0,24,1280,672&w=1200&h=630&fit=crop&auto=format
