@@ -1,599 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ImageVault</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(145deg, #f5f7fc 0%, #eef2f8 100%);
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            padding: 2rem 1.5rem;
-            color: #1a2634;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* header & zoekvak */
-        .hero {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        h1 {
-            font-size: 2.6rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1e3c72, #2b4c7c);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .sub {
-            color: #4a627a;
-            margin-top: 8px;
-            font-weight: 500;
-        }
-
-        .search-panel {
-            background: white;
-            border-radius: 60px;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.02);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 700px;
-            margin: 24px auto 10px auto;
-            padding: 6px 6px 6px 24px;
-            transition: all 0.2s;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .search-panel:focus-within {
-            box-shadow: 0 18px 32px rgba(0, 0, 0, 0.12);
-            border-color: #8bb3d4;
-        }
-
-        .search-input {
-            flex: 1;
-            border: none;
-            font-size: 1.1rem;
-            padding: 14px 0;
-            background: transparent;
-            outline: none;
-            font-weight: 500;
-            color: #1a2c3e;
-        }
-
-        .search-input::placeholder {
-            color: #9aaebf;
-            font-weight: 400;
-        }
-
-        .search-btn {
-            background: #1f6392;
-            border: none;
-            color: white;
-            padding: 10px 28px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .search-btn:hover {
-            background: #0e4a70;
-            transform: scale(0.97);
-        }
-
-        .stats {
-            text-align: center;
-            font-size: 0.9rem;
-            color: #4c6a82;
-            margin-top: 12px;
-            font-weight: 500;
-        }
-
-        /* foutmelding / loading */
-        .info-message {
-            background: #fff1e0;
-            border-left: 6px solid #f5a623;
-            padding: 14px 20px;
-            border-radius: 20px;
-            max-width: 800px;
-            margin: 20px auto;
-            font-weight: 500;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .loading {
-            background: #e3f0fa;
-            border-left-color: #2b7bb6;
-        }
-
-        /* grid met afbeeldingen */
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 28px;
-            margin-top: 2rem;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(0px);
-            border-radius: 28px;
-            overflow: hidden;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
-            transition: all 0.25s ease;
-            border: 1px solid rgba(255,255,255,0.6);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.12);
-        }
-
-        .img-wrapper {
-            background: #eef2f5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            min-height: 220px;
-            cursor: pointer;
-            position: relative;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .img-wrapper img {
-            max-width: 100%;
-            max-height: 200px;
-            object-fit: contain;
-            transition: transform 0.2s;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .card-info {
-            padding: 18px 16px 20px 16px;
-            background: #ffffff;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .img-name {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #1a3a52;
-            word-break: break-word;
-            background: #f0f4f9;
-            padding: 6px 12px;
-            border-radius: 30px;
-            display: inline-block;
-            align-self: flex-start;
-        }
-
-        .path-meta {
-            font-size: 0.75rem;
-            font-family: monospace;
-            color: #6585a3;
-            background: #f8fafc;
-            padding: 4px 8px;
-            border-radius: 20px;
-            word-break: break-all;
-        }
-
-        .download-btn {
-            background: #2c6e9e;
-            border: none;
-            color: white;
-            padding: 10px 0;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-top: 6px;
-            width: 100%;
-            font-family: inherit;
-        }
-
-        .download-btn:hover {
-            background: #114e73;
-            gap: 14px;
-        }
-
-        .preview-hint {
-            font-size: 0.7rem;
-            text-align: center;
-            color: #7d9bbc;
-            margin-top: 4px;
-            cursor: pointer;
-        }
-
-        .no-results {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px 20px;
-            background: rgba(255,255,240,0.7);
-            border-radius: 50px;
-            font-size: 1.2rem;
-            color: #4f6f8f;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 60px;
-            font-size: 0.8rem;
-            color: #7d99b0;
-            border-top: 1px solid #dce5ed;
-            padding-top: 30px;
-        }
-
-        @media (max-width: 640px) {
-            body {
-                padding: 1rem;
-            }
-            .search-panel {
-                padding: 5px 5px 5px 16px;
-            }
-            .search-btn {
-                padding: 8px 18px;
-            }
-            h1 {
-                font-size: 1.9rem;
-            }
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Afbeeldingen downloaden</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #fff; --text: #1c1f24; --muted: #6b7280;
+    --accent: #2563eb; --accent-hover: #1d4ed8; --border: #e5e7eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111418; --card: #1a1e24; --text: #eef0f3; --muted: #9aa3af; --border: #2a303a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); }
+  header { padding: 32px 16px 8px; max-width: 1100px; margin: 0 auto; }
+  h1 { margin: 0 0 4px; font-size: 1.8rem; }
+  .sub { color: var(--muted); margin: 0; }
+  .bar { max-width: 1100px; margin: 16px auto 0; padding: 0 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .bar input[type=search] { flex: 1 1 220px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 1rem; }
+  button, .btn { cursor: pointer; border: 0; border-radius: 8px; padding: 10px 14px; font-size: .95rem; background: var(--accent); color: #fff; text-decoration: none; display: inline-block; text-align: center; }
+  button:hover, .btn:hover { background: var(--accent-hover); }
+  button.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  button.secondary:hover { background: var(--card); }
+  main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+  .thumb { aspect-ratio: 4/3; background: var(--bg); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb .err { color: var(--muted); font-size: .85rem; padding: 8px; text-align: center; }
+  .info { padding: 12px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .name { font-weight: 600; word-break: break-word; }
+  .info button { margin-top: auto; }
+  .msg { text-align: center; color: var(--muted); padding: 40px 16px; }
+  .msg textarea { width: 100%; max-width: 640px; height: 140px; margin-top: 12px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-family: ui-monospace, monospace; }
+  .msg .row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+  .hidden { display: none; }
+</style>
 </head>
 <body>
+<header>
+  <h1>Afbeeldingen</h1>
+  <p class="sub" id="count">Laden…</p>
+</header>
 
-<div class="container">
-    <div class="hero">
-        <h1>ImageVault</h1>
-        <div class="sub">Download hoge kwaliteit afbeeldingen</div>
-    </div>
-
-    <div class="search-panel">
-        <input type="text" id="searchInput" class="search-input" placeholder="Zoek afbeeldingen" autocomplete="off">
-        <button id="searchButton" class="search-btn">Zoek</button>
-    </div>
-    <div id="statsArea" class="stats"></div>
-
-    <div id="messageArea" class="info-message" style="display: none;"></div>
-
-    <div id="galleryContainer" class="gallery">
-        <!-- dynamische kaarten worden hier ingeladen -->
-        <div class="no-results" style="opacity: 0.7;">✨ Voer een zoekterm in of begin met bladeren<br>Afbeeldingen database wordt geladen...</div>
-    </div>
+<div class="bar">
+  <input type="search" id="search" placeholder="Zoek op naam…" aria-label="Zoeken">
+  <button id="all" class="secondary" title="Download alle zichtbare afbeeldingen">Alles downloaden</button>
+  <button id="load" class="secondary">Ander bestand laden</button>
+  <input type="file" id="file" accept=".txt,text/plain" class="hidden">
 </div>
 
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="msg hidden" id="fallback">
+    <p>Het bestand <b>afbeeldingsnamen.txt</b> kon niet automatisch worden geladen.<br>
+    Dit gebeurt als je de pagina direct vanaf je computer opent. Kies het bestand of plak de inhoud hieronder.</p>
+    <div class="row"><button id="pick">Bestand kiezen</button></div>
+    <textarea id="paste" placeholder="naam afbeelding = https://voorbeeld.nl/plaatje.jpg"></textarea>
+    <div class="row"><button id="usePaste">Toon afbeeldingen</button></div>
+  </div>
+</main>
+
 <script>
-    // ---------- GLOBALE DATA STRUCTUUR ----------
-    // We slaan alle afbeeldingen op als objecten: { name, path }
-    let masterImageList = [];       // volledige lijst
-    let filteredList = [];          // huidige gefilterde lijst op basis van zoekterm
-    let dataLoaded = false;
+const $ = id => document.getElementById(id);
+let items = [];
 
-    // DOM elementen
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchButton');
-    const galleryDiv = document.getElementById('galleryContainer');
-    const statsSpan = document.getElementById('statsArea');
-    const msgDiv = document.getElementById('messageArea');
+function parse(text) {
+  return text.split(/\r?\n/).map(l => l.trim())
+    .filter(l => l && !l.startsWith('#'))
+    .map(l => {
+      const i = l.indexOf('=');
+      if (i < 1) return null;
+      const name = l.slice(0, i).trim();
+      const url = l.slice(i + 1).trim();
+      return name && url ? { name, url } : null;
+    }).filter(Boolean);
+}
 
-    // Helpers om berichten te tonen/verbergen
-    function showMessage(text, isError = false, isLoading = false) {
-        msgDiv.style.display = 'flex';
-        msgDiv.innerHTML = '';
-        if (isLoading) {
-            msgDiv.classList.add('loading');
-            msgDiv.classList.remove('info-message');
-            msgDiv.style.background = '#e9f2f9';
-            msgDiv.style.borderLeftColor = '#2b7bb6';
-        } else {
-            msgDiv.classList.remove('loading');
-            msgDiv.style.background = isError ? '#ffe9e6' : '#eef6e6';
-            msgDiv.style.borderLeftColor = isError ? '#e06c4e' : '#4caf50';
-        }
-        const icon = isError ? '⚠️' : (isLoading ? '⏳' : 'ℹ️');
-        msgDiv.innerHTML = `${icon} ${text}`;
-        if (!text) msgDiv.style.display = 'none';
-    }
+function extFromUrl(url) {
+  try {
+    const m = new URL(url, location.href).pathname.match(/\.([a-z0-9]{2,5})$/i);
+    return m ? m[1].toLowerCase() : '';
+  } catch { return ''; }
+}
 
-    function hideMessage() {
-        msgDiv.style.display = 'none';
-    }
+function safeName(name) {
+  return name.replace(/[\\/:*?"<>|]+/g, '_').trim() || 'afbeelding';
+}
 
-    // Update statistieken en gallery weergave
-    function updateUI() {
-        if (!dataLoaded) {
-            statsSpan.innerText = 'Database initialiseren...';
-            return;
-        }
+async function download(item, btn) {
+  const label = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+  try {
+    const res = await fetch(item.url);
+    if (!res.ok) throw new Error(res.status);
+    const blob = await res.blob();
+    let ext = extFromUrl(item.url);
+    if (!ext) ext = (blob.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg').split('+')[0];
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = safeName(item.name) + '.' + ext;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  } catch (e) {
+    // Fallback als de server directe downloads blokkeert (CORS): open in nieuw tabblad
+    const a = document.createElement('a');
+    a.href = item.url; a.download = safeName(item.name);
+    a.target = '_blank'; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = label; }
+  }
+}
 
-        const total = filteredList.length;
-        const term = searchInput.value.trim();
-        if (total === 0) {
-            statsSpan.innerText = term ? `😕 Geen afbeeldingen gevonden voor “${escapeHtml(term)}”` : `📸 ${masterImageList.length} afbeeldingen beschikbaar — typ een zoekwoord`;
-        } else {
-            statsSpan.innerText = term ? `🎯 ${total} resultaten voor “${escapeHtml(term)}”)` : `Alle ${total} afbeeldingen weergeven`;
-        }
-        renderGallery();
-    }
+function visible() {
+  const q = $('search').value.trim().toLowerCase();
+  return items.filter(i => i.name.toLowerCase().includes(q));
+}
 
-    // Veilige HTML escape voor namen (voorkomt XSS)
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
-        });
-    }
+function render() {
+  const list = visible();
+  $('count').textContent = items.length
+    ? `${list.length} van ${items.length} afbeelding${items.length === 1 ? '' : 'en'}`
+    : 'Geen afbeeldingen gevonden';
+  const grid = $('grid');
+  grid.innerHTML = '';
+  list.forEach(item => {
+    const card = document.createElement('div'); card.className = 'card';
+    const thumb = document.createElement('div'); thumb.className = 'thumb';
+    const img = document.createElement('img');
+    img.loading = 'lazy'; img.alt = item.name; img.src = item.url;
+    img.onerror = () => { thumb.innerHTML = '<div class="err">Voorbeeld niet beschikbaar</div>'; };
+    thumb.appendChild(img);
+    const info = document.createElement('div'); info.className = 'info';
+    const name = document.createElement('div'); name.className = 'name'; name.textContent = item.name;
+    const btn = document.createElement('button'); btn.textContent = 'Downloaden';
+    btn.onclick = () => download(item, btn);
+    info.append(name, btn);
+    card.append(thumb, info);
+    grid.appendChild(card);
+  });
+}
 
-    // Afbeelding laden met fallback bij fouten (gebroken pad)
-    function setImageWithFallback(imgElement, src, imageName) {
-        imgElement.onload = () => {};
-        imgElement.onerror = () => {
-            imgElement.onerror = null;
-            imgElement.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f2f5"/%3E%3Ctext x="50" y="55" font-size="12" text-anchor="middle" fill="%23888"%3E⚠️ ontbreekt%3C/text%3E%3C/svg%3E';
-            imgElement.style.filter = 'grayscale(0.2)';
-            imgElement.alt = `${imageName} (bestand niet gevonden)`;
-            // Voeg een kleine tooltip toe
-            imgElement.title = `Origineel pad: ${src} bestaat niet`;
-        };
-        imgElement.src = src;
-        imgElement.alt = imageName;
-    }
+function setItems(text) {
+  items = parse(text);
+  $('fallback').classList.add('hidden');
+  render();
+}
 
-    // Download functie: originele afbeelding ophalen via fetch + blob (high quality)
-    async function downloadImage(url, fileName) {
-        if (!url) {
-            showMessage("⚠️ Geen geldig bestandspad om te downloaden.", true);
-            return;
-        }
-        // Toon loading kort (kan optioneel)
-        try {
-            const response = await fetch(url, { mode: 'cors' }); // relatief pad werkt lokaal ook voor cross-origin? normaal ok
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status} - bestand niet bereikbaar`);
-            }
-            const blob = await response.blob();
-            // Maak een tijdelijke download link
-            const blobUrl = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            // Zorg voor een nette bestandsnaam op basis van originele bestandsnaam uit pad
-            let suggestedName = fileName;
-            if (!suggestedName.includes('.')) {
-                const parts = url.split('/');
-                let lastPart = parts[parts.length-1];
-                if (lastPart && lastPart.includes('.')) {
-                    suggestedName = lastPart;
-                } else {
-                    suggestedName += '.png'; // fallback extensie, maar origineel is behouden
-                }
-            }
-            a.href = blobUrl;
-            a.download = suggestedName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(blobUrl);
-            showMessage(`Download gestart: ${suggestedName}`, false);
-            setTimeout(() => hideMessage(), 1800);
-        } catch (err) {
-            console.error("Download fout", err);
-            showMessage(`Download mislukt voor "${fileName}": bestand niet toegankelijk of pad incorrect.`, true);
-            setTimeout(() => {
-                if (msgDiv.style.display !== 'none') hideMessage();
-            }, 3000);
-        }
-    }
+async function init() {
+  try {
+    const res = await fetch('afbeeldingsnamen.txt', { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    setItems(await res.text());
+  } catch {
+    $('count').textContent = 'Bestand niet geladen';
+    $('fallback').classList.remove('hidden');
+  }
+}
 
-    // Gallery renderen op basis van filteredList
-    function renderGallery() {
-        if (!dataLoaded) {
-            galleryDiv.innerHTML = `<div class="no-results">Bezig met laden van afbeeldingsnamen...</div>`;
-            return;
-        }
+$('search').addEventListener('input', render);
+$('all').onclick = async () => {
+  for (const item of visible()) { await download(item); await new Promise(r => setTimeout(r, 400)); }
+};
+const openPicker = () => $('file').click();
+$('load').onclick = openPicker;
+$('pick').onclick = openPicker;
+$('file').onchange = async e => { const f = e.target.files[0]; if (f) setItems(await f.text()); };
+$('usePaste').onclick = () => setItems($('paste').value);
 
-        if (filteredList.length === 0) {
-            galleryDiv.innerHTML = `<div class="no-results">Geen overeenkomende afbeeldingen.<br>Probeer een andere zoekterm.</div>`;
-            return;
-        }
-
-        let html = '';
-        for (let img of filteredList) {
-            const safeName = escapeHtml(img.name);
-            const rawPath = img.path;
-            // Relatief pad t.o.v. de root van de website (zelfde map als HTML) — zoals "dieren/leeuw.png"
-            const imageSrc = rawPath;
-            const downloadFileName = rawPath.split('/').pop() || `${safeName}.img`;
-
-            html += `
-                <div class="card" data-name="${safeName}" data-path="${escapeHtml(rawPath)}">
-                    <div class="img-wrapper">
-                        <img class="gallery-img" loading="lazy" data-src="${escapeHtml(imageSrc)}" alt="${safeName}" 
-                             style="cursor: pointer;" title="Klik voor preview / klik met rechts om op te slaan">
-                    </div>
-                    <div class="card-info">
-                        <span class="img-name">${safeName}</span>
-                        <span class="path-meta">${escapeHtml(rawPath.length > 50 ? rawPath.substring(0, 47) + '...' : rawPath)}</span>
-                        <button class="download-btn" data-imgname="${escapeHtml(safeName)}" data-path="${escapeHtml(rawPath)}" data-filename="${escapeHtml(downloadFileName)}">
-                            Download origineel
-                        </button>
-                        <div class="preview-hint">Klik op afbeelding voor grotere preview</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        galleryDiv.innerHTML = html;
-
-        // Alle img elementen voorzien van echte src + lazy load + fallback en download event listeners
-        const cards = document.querySelectorAll('.card');
-        cards.forEach((card, idx) => {
-            const imgWrapper = card.querySelector('.img-wrapper');
-            const imgElement = imgWrapper.querySelector('img');
-            const originalSrc = imgElement.getAttribute('data-src');
-            if (originalSrc) {
-                setImageWithFallback(imgElement, originalSrc, card.getAttribute('data-name') || 'afbeelding');
-            }
-
-            // Download knop event
-            const downloadBtn = card.querySelector('.download-btn');
-            if (downloadBtn) {
-                const imgPath = downloadBtn.getAttribute('data-path');
-                const fileNameForDownload = downloadBtn.getAttribute('data-filename');
-                downloadBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    downloadImage(imgPath, fileNameForDownload);
-                });
-            }
-
-            // Klik op afbeelding = grotere preview in nieuw tabblad (originele kwaliteit)
-            if (imgElement) {
-                imgElement.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const highResUrl = imgElement.getAttribute('data-src') || imgElement.src;
-                    if (highResUrl && !highResUrl.includes('data:image/svg')) {
-                        window.open(highResUrl, '_blank');
-                    } else {
-                        showMessage("Preview niet beschikbaar (bestand ontbreekt)", true);
-                        setTimeout(() => hideMessage(), 1200);
-                    }
-                });
-            }
-        });
-    }
-
-    // Filteren op base naam (case-insensitive, partial match)
-    function performSearch() {
-        if (!masterImageList.length) {
-            // Als data nog niet geladen is, proberen we niet te filteren
-            return;
-        }
-        const query = searchInput.value.trim().toLowerCase();
-        if (query === "") {
-            filteredList = [...masterImageList];
-        } else {
-            filteredList = masterImageList.filter(item => item.name.toLowerCase().includes(query));
-        }
-        updateUI();
-    }
-
-    // Laden van de afbeeldingsnamen.txt bestand (verwacht formaat: "naam = pad/naar/bestand.png")
-    async function loadImageIndex() {
-        showMessage("Bezig met laden van afbeeldingen...", false, true);
-        try {
-            const response = await fetch('afbeeldingsnamen.txt');
-            if (!response.ok) {
-                throw new Error(`Kan bestand niet laden (HTTP ${response.status}). Zorg dat afbeeldingsnamen.txt in dezelfde map staat.`);
-            }
-            const text = await response.text();
-            const lines = text.split(/\r?\n/);
-            const images = [];
-
-            for (let line of lines) {
-                line = line.trim();
-                if (line === "" || line.startsWith("#")) continue; // lege regels / comments overslaan
-
-                // Splits op de eerste '=' 
-                const equalIndex = line.indexOf('=');
-                if (equalIndex === -1) {
-                    console.warn(`Ongeldige regel (missende '='): ${line}`);
-                    continue;
-                }
-                let rawName = line.substring(0, equalIndex).trim();
-                let rawPath = line.substring(equalIndex + 1).trim();
-
-                if (rawName === "" || rawPath === "") {
-                    console.warn(`Lege naam of pad: ${line}`);
-                    continue;
-                }
-
-                // Optioneel: als pad geen extensie heeft, melding maar toch accepteren
-                images.push({
-                    name: rawName,
-                    path: rawPath
-                });
-            }
-
-            if (images.length === 0) {
-                throw new Error("Geen geldige afbeeldingen gevonden in afbeeldingsnamen.txt. Controleer formaat: 'naam = pad/afbeelding.png'");
-            }
-
-            masterImageList = images;
-            filteredList = [...masterImageList]; // initieel toon alles
-            dataLoaded = true;
-            hideMessage();
-            updateUI();
-            showMessage(`Succes: ${masterImageList.length} afbeeldingen geladen uit index.`, false);
-            setTimeout(() => hideMessage(), 2500);
-        } catch (err) {
-            console.error(err);
-            dataLoaded = false;
-            showMessage(`Fout bij laden index: ${err.message}. Controleer of afbeeldingsnamen.txt in de root staat.`, true);
-            galleryDiv.innerHTML = `<div class="no-results" style="background:#fff0ed;">Database niet bereikbaar:<br>${escapeHtml(err.message)}<br><br>📄 Voorbeeld regel in afbeeldingsnamen.txt:<br>"leeuw = dieren/leeuw.png"</div>`;
-            statsSpan.innerText = 'Indexbestand ontbreekt of ongeldig';
-        }
-    }
-
-    // Event listeners
-    function bindEvents() {
-        searchBtn.addEventListener('click', () => {
-            performSearch();
-        });
-        searchInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
-        });
-    }
-
-    // Initialiseer app
-    function init() {
-        bindEvents();
-        loadImageIndex();
-    }
-
-    init();
+init();
 </script>
 </body>
 </html>
